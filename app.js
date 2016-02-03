@@ -3,7 +3,6 @@ var people = ['graven', 'andrew', 'peter', 'jenny', 'tom'],
   beverage = ['coffee', 'water', 'coffee', 'water', 'coffee'],
   hours = [8,9,10,11,12,1,2,3,4,5,6],
   minutes = ['05', '07', 10, 15, 25, 30, 44, 50, 56],
-  coffeeObj = {},
   dataArray = [];
 
   function shuffle(o){
@@ -11,10 +10,11 @@ var people = ['graven', 'andrew', 'peter', 'jenny', 'tom'],
       return o;
   }
 
-for (var i = 0; i < 34; i++) {
+for (var i = 0; i < 10; i++) {
+  var coffeeObj = {};
   coffeeObj.name = shuffle(people)[0];
   coffeeObj.type = shuffle(beverage)[0];
-  coffeeObj.time = shuffle(hours)[0] + ':' + shuffle(minutes)[0];
+  coffeeObj.time = shuffle(hours)[0] + shuffle(minutes)[0];
   dataArray.push(coffeeObj);
 }
 
@@ -34,6 +34,8 @@ var svg = d3.select("#chart").append("svg") // attach chart to the DOM and cente
     .attr("height", height + margin.top + margin.bottom)
     .append("g") // an svg "group", similar to an html "div"
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// NEXT: define x-axis as time!!!
 
 // var colorScale = d3.scale.ordinal() // map array of values to array of colors
 //     .domain(values) // move this inside of data callback and change this to newValues if you use option code to generate domain from the data
@@ -76,8 +78,8 @@ var svg = d3.select("#chart").append("svg") // attach chart to the DOM and cente
 
 nio.source.generate(function(iter) {
   return dataArray[iter]}
-  , 5, 1000).pipe(nio.pass(function(chunk) {
-   console.log(chunk.userId + ' ' + chunk.date + ' ' + chunk.type + ' ' + chunk.time);
+  , dataArray.length, 1000).pipe(nio.pass(function(chunk) {
+   console.log(chunk.name + ' ' + chunk.type + ' ' + chunk.time);
 }));
 
 // d3.tsv("coffee-data.tsv", // Data parsing! Your data here: ('path', callback(), callback())
@@ -125,18 +127,17 @@ nio.source.generate(function(iter) {
         .enter()
         .append("circle")
         .attr("cx", function(d) {
-          return d[0];
+          console.log(parseInt(d.time));
+          return d.time;
         })
-        .attr("cy", function(d) {
-          return d[1];
+        .attr("cy", function(d, i) {
+          return i;
         })
-        .attr("r", function(d) {
-          return Math.sqrt(h - d[1]);
-        })
+        .attr("r", 5)
         .attr("fill", "#00aa88");
 
       svg.selectAll("text")
-        .data(dataset)
+        .data(dataArray)
         .enter()
         .append("text")
         .text(function(d) {
